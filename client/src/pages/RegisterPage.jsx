@@ -6,14 +6,18 @@ const RegisterPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
     try {
       await authService.register(username, password);
       // Redirect to login after successful registration
-      navigate("/login");
+      setSuccess("Registration successful! Redirecting to login...");
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
     }
@@ -24,12 +28,28 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="bg-bg-secondary p-8 rounded-xl w-full max-w-[400px] shadow-lg">
-        <h2 className="text-center mb-6 text-2xl font-semibold">
+    <div className="flex items-center justify-center h-screen bg-black/90">
+      <div className="bg-bg-secondary p-8 rounded-xl w-full max-w-[400px] shadow-2xl border border-white/5 relative overflow-hidden">
+        {/* Luxury Decor */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-50"></div>
+
+        <h2 className="text-center mb-2 text-2xl font-bold text-white tracking-wide">
           Create Account
         </h2>
-        {error && <div className="text-danger mb-4 text-center">{error}</div>}
+        <p className="text-center mb-8 text-sm font-medium bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent italic animate-pulse">
+          "Selamat datang orang baik"
+        </p>
+
+        {error && (
+          <div className="p-3 mb-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg text-center">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="p-3 mb-4 text-sm text-green-400 bg-green-500/10 border border-green-500/20 rounded-lg text-center font-semibold">
+            {success}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="block mb-2 text-sm font-medium">Username</label>
@@ -51,7 +71,10 @@ const RegisterPage = () => {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary mt-2">
+          <button
+            type="submit"
+            className="btn btn-primary mt-2 w-full py-2.5 font-bold shadow-lg shadow-accent/20"
+          >
             Register
           </button>
         </form>

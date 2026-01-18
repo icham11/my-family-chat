@@ -7,6 +7,7 @@ const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -20,21 +21,20 @@ const LoginPage = () => {
       setError("Authentication failed.");
     } else if (token) {
       // Fetch user data with the token
-      // We need to temporarily set the token for api calls or just use it manually?
-      // api.js interceptor uses localStorage "token".
-      // So let's save it temporarily.
       localStorage.setItem("token", token);
+      setSuccess("Login successful! Redirecting...");
 
       authService
         .getMe()
         .then(({ data }) => {
           login(data, token);
-          navigate("/chat");
+          setTimeout(() => navigate("/chat"), 1500);
         })
         .catch((err) => {
           console.error(err);
           setError("Failed to verify Google login.");
           localStorage.removeItem("token");
+          setSuccess("");
         });
     }
   }, [login, navigate]);
@@ -43,19 +43,18 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const { data } = await authService.login(username, password);
+      setSuccess("Login successful! Welcome back.");
       login(data.user, data.token);
-      navigate("/chat");
+      setTimeout(() => navigate("/chat"), 1500);
     } catch (err) {
       console.error("Login Error Details:", err);
       let errorMsg = "Login failed";
+      // ... existing error handling ...
       if (err.response) {
-        // Server responded with a status code
         errorMsg =
           err.response.data?.message || `Server error (${err.response.status})`;
       } else if (err.request) {
-        // Request made but no response received (Network or Mixed Content)
-        errorMsg =
-          "Network Error: Server unreachable or blocked by browser (Mixed Content?)";
+        errorMsg = "Network Error: Server unreachable or blocked by browser.";
       } else {
         errorMsg = err.message;
       }
@@ -68,12 +67,28 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="bg-bg-secondary p-8 rounded-xl w-full max-w-[400px] shadow-lg">
-        <h2 className="text-center mb-6 text-2xl font-semibold">
+    <div className="flex items-center justify-center h-screen bg-black/90">
+      <div className="bg-bg-secondary p-8 rounded-xl w-full max-w-[400px] shadow-2xl border border-white/5 relative overflow-hidden">
+        {/* Luxury Decor */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-50"></div>
+
+        <h2 className="text-center mb-2 text-2xl font-bold text-white tracking-wide">
           Welcome Back
         </h2>
-        {error && <div className="text-danger mb-4 text-center">{error}</div>}
+        <p className="text-center mb-8 text-sm font-medium bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent italic animate-pulse">
+          "Selamat datang orang baik"
+        </p>
+
+        {error && (
+          <div className="p-3 mb-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg text-center">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="p-3 mb-4 text-sm text-green-400 bg-green-500/10 border border-green-500/20 rounded-lg text-center font-semibold">
+            {success}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* ... inputs ... */}
           <div>
@@ -96,7 +111,10 @@ const LoginPage = () => {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary mt-2">
+          <button
+            type="submit"
+            className="btn btn-primary mt-2 w-full py-2.5 font-bold shadow-lg shadow-accent/20"
+          >
             Login
           </button>
         </form>
