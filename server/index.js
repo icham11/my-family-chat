@@ -22,6 +22,7 @@ app.use(
       "http://localhost:5173",
       "https://family-chat-99.web.app",
       "http://54.169.128.182:3000",
+      "https://api.surgamenginap.site",
     ],
     credentials: true,
   }),
