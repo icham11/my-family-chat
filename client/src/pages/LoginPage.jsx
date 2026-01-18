@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { authService } from "../services/api";
+import { authService, API_URL } from "../services/api";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -46,7 +46,20 @@ const LoginPage = () => {
       login(data.user, data.token);
       navigate("/chat");
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      console.error("Login Error Details:", err);
+      let errorMsg = "Login failed";
+      if (err.response) {
+        // Server responded with a status code
+        errorMsg =
+          err.response.data?.message || `Server error (${err.response.status})`;
+      } else if (err.request) {
+        // Request made but no response received (Network or Mixed Content)
+        errorMsg =
+          "Network Error: Server unreachable or blocked by browser (Mixed Content?)";
+      } else {
+        errorMsg = err.message;
+      }
+      setError(errorMsg);
     }
   };
 
