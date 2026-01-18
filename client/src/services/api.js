@@ -30,6 +30,8 @@ export const chatService = {
   createDirectRoom: (targetUserId) =>
     api.post("/chat/rooms/dm", { targetUserId }),
   joinRoom: (inviteCode) => api.post("/chat/rooms/join", { inviteCode }),
+  addMember: (roomId, username) =>
+    api.post(`/chat/room/${roomId}/members`, { username }),
   searchUsers: (q) => api.get("/user/search", { params: { q } }),
   uploadImage: (formData) =>
     api.post("/upload", formData, {

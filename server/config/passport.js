@@ -7,7 +7,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID || "PLACEHOLDER_ID",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "PLACEHOLDER_SECRET",
-      callbackURL: "/api/auth/google/callback",
+      callbackURL: "https://api.surgamenginap.site/api/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

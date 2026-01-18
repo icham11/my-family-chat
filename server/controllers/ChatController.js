@@ -58,7 +58,18 @@ const ChatController = {
       if (!name)
         return res.status(400).json({ message: "Room name is required" });
 
-      const newRoom = await Room.create({ name, description, avatar_url });
+      // Clean simple random string
+      const invite_code = Math.random()
+        .toString(36)
+        .substring(2, 8)
+        .toUpperCase();
+
+      const newRoom = await Room.create({
+        name,
+        description,
+        avatar_url,
+        invite_code,
+      });
 
       // Auto-join creator?
       if (req.user) {
@@ -86,6 +97,14 @@ const ChatController = {
             through: { attributes: ["last_read_message_id", "role"] },
             attributes: ["id", "username", "avatar_url"],
           },
+        ],
+        attributes: [
+          "id",
+          "name",
+          "description",
+          "avatar_url",
+          "invite_code",
+          "type",
         ],
       });
 
@@ -322,6 +341,83 @@ const ChatController = {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message });
+    }
+  },
+  async joinRoom(req, res) {
+    try {
+      const { inviteCode } = req.body;
+      const { id: userId } = req.user;
+
+      if (!inviteCode) {
+        return res.status(400).json({ message: "Invite code is required" });
+      }
+
+      const room = await Room.findOne({ where: { invite_code: inviteCode } });
+      if (!room) {
+        return res.status(404).json({ message: "Invalid invite code" });
+      }
+
+      // Check if already a member
+      const existingMember = await RoomMember.findOne({
+        where: { room_id: room.id, user_id: userId },
+      });
+
+      if (existingMember) {
+        return res.json({ message: "Already a member", room });
+      }
+
+      await RoomMember.create({
+        room_id: room.id,
+        user_id: userId,
+        role: "member",
+      });
+
+      res.json({ message: "Joined successfully", room });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+  async addMember(req, res) {
+    try {
+      const { roomId } = req.params;
+      const { username } = req.body;
+
+      if (!username) {
+        return res.status(400).json({ message: "Username is required" });
+      }
+
+      const room = await Room.findByPk(roomId);
+      if (!room) {
+        return res.status(404).json({ message: "Room not found" });
+      }
+
+      const userToAdd = await User.findOne({ where: { username } });
+      if (!userToAdd) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if already a member
+      const existingMember = await RoomMember.findOne({
+        where: { room_id: room.id, user_id: userToAdd.id },
+      });
+
+      if (existingMember) {
+        return res.status(400).json({ message: "User is already a member" });
+      }
+
+      await RoomMember.create({
+        room_id: room.id,
+        user_id: userToAdd.id,
+        role: "member",
+      });
+
+      // Fetch updated room details to return? Or just success message
+      // Let's return the added user so frontend can update list immediately
+      res.json({ message: "Member added successfully", user: userToAdd });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Server error" });
     }
   },
 };

@@ -6,7 +6,13 @@ const { Room } = require("../models");
 
 router.get("/rooms", authenticateToken, ChatController.getRooms);
 router.post("/rooms/dm", authenticateToken, ChatController.createDirectRoom);
+router.post("/rooms/join", authenticateToken, ChatController.joinRoom);
 router.post("/room", authenticateToken, ChatController.createRoom);
+router.post(
+  "/room/:roomId/members",
+  authenticateToken,
+  ChatController.addMember,
+);
 router.get(
   "/room/:roomId/media",
   authenticateToken,

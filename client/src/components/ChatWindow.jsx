@@ -9,6 +9,7 @@ import {
 import Avatar from "./Avatar";
 import { chatService } from "../services/api";
 import CameraModal from "./CameraModal";
+import AddMemberModal from "./AddMemberModal";
 
 const ChatWindow = ({
   room,
@@ -28,6 +29,7 @@ const ChatWindow = ({
 }) => {
   const messagesEndRef = useRef(null);
   const [showCamera, setShowCamera] = useState(false);
+  const [showAddMember, setShowAddMember] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleCameraCapture = async (file, type) => {
@@ -125,6 +127,32 @@ const ChatWindow = ({
         {/* Header Actions */}
         <div className="flex items-center gap-1">
           <button
+            onClick={() => setShowCamera(true)}
+            className="text-text-secondary hover:text-accent p-2"
+            title="Take Photo/Video"
+            disabled={isUploading}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
+              />
+            </svg>
+          </button>
+          <button
             onClick={onShowMedia}
             className="text-text-secondary hover:text-accent p-2"
             title="Media History"
@@ -150,7 +178,21 @@ const ChatWindow = ({
             <button className="text-text-secondary hover:text-accent p-2">
               <EllipsisVerticalIcon className="w-6 h-6" />
             </button>
-            <div className="absolute right-0 top-full mt-1 w-32 bg-bg-secondary rounded-lg shadow-lg border border-bg-tertiary hidden group-hover:block z-20">
+            <div className="absolute right-0 top-full mt-1 w-40 bg-bg-secondary rounded-lg shadow-lg border border-bg-tertiary hidden group-hover:block z-20">
+              <button
+                onClick={() => setShowAddMember(true)}
+                className="w-full text-left px-4 py-2 hover:bg-bg-tertiary text-sm flex items-center gap-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="size-4"
+                >
+                  <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+                </svg>
+                Add Member
+              </button>
               <button
                 onClick={onEditRoom}
                 className="w-full text-left px-4 py-2 hover:bg-bg-tertiary text-sm flex items-center gap-2"
@@ -208,6 +250,20 @@ const ChatWindow = ({
           onCapture={handleCameraCapture}
         />
       )}
+
+      <AddMemberModal
+        isOpen={showAddMember}
+        onClose={() => setShowAddMember(false)}
+        roomId={room.id}
+        onMemberAdded={() => {
+          // Ideally refresh room details here, but for now just close
+          // Maybe onEditRoom could trigger a refresh if we passed a callback
+          if (room.id) {
+            // We can't easily refresh parent state from here without a huge refactor
+            // For now, let's just alert success in the modal (already done)
+          }
+        }}
+      />
       {/* Input */}
       <MessageInput
         onSendMessage={onSendMessage}
