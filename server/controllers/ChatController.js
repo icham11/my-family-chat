@@ -110,6 +110,15 @@ const ChatController = {
 
       if (!room) return res.status(404).json({ message: "Room not found" });
 
+      // Backfill invite code for old rooms
+      if (room.type === "group" && !room.invite_code) {
+        room.invite_code = Math.random()
+          .toString(36)
+          .substring(2, 8)
+          .toUpperCase();
+        await room.save();
+      }
+
       const plainRoom = room.get({ plain: true });
       const response = {
         ...plainRoom,
