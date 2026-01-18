@@ -7,6 +7,8 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import Avatar from "./Avatar";
+import { chatService } from "../services/api";
+import CameraModal from "./CameraModal";
 
 const ChatWindow = ({
   room,
@@ -25,6 +27,32 @@ const ChatWindow = ({
   onBack,
 }) => {
   const messagesEndRef = useRef(null);
+  const [showCamera, setShowCamera] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleCameraCapture = async (file, type) => {
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file); // API expects "image" field for both images and probably videos if using same endpoint?
+      // Wait, API endpoint /upload usually returns "filePath".
+      // Need to verify if backend handles other mimetypes. Backend uses multer.
+      // Let's assume standard /upload endpoint.
+
+      const { data } = await chatService.uploadImage(formData);
+
+      onSendMessage({
+        content: "",
+        type: type, // "image" or "video"
+        attachmentUrl: data.filePath,
+      });
+    } catch (error) {
+      console.error("Upload failed", error);
+      alert("Failed to upload captured media");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -78,6 +106,17 @@ const ChatWindow = ({
               {roomDetails
                 ? `${roomDetails.memberCount} members`
                 : "Loading..."}
+              {roomDetails?.invite_code && (
+                <span
+                  className="ml-2 text-accent bg-accent/10 px-2 py-0.5 rounded text-[10px] select-all cursor-pointer"
+                  title="Click to copy"
+                  onClick={() =>
+                    navigator.clipboard.writeText(roomDetails.invite_code)
+                  }
+                >
+                  Code: {roomDetails.invite_code}
+                </span>
+              )}
               {room.description && ` • ${room.description}`}
             </p>
           </div>
@@ -163,6 +202,12 @@ const ChatWindow = ({
         <div ref={messagesEndRef} />
       </div>
 
+      {showCamera && (
+        <CameraModal
+          onClose={() => setShowCamera(false)}
+          onCapture={handleCameraCapture}
+        />
+      )}
       {/* Input */}
       <MessageInput
         onSendMessage={onSendMessage}

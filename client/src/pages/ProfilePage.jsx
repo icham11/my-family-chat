@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { chatService } from "../services/api";
+import { chatService, SERVER_URL } from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
 
 const ProfilePage = () => {
@@ -113,7 +113,7 @@ const ProfilePage = () => {
                 src={
                   avatarUrl.startsWith("http")
                     ? avatarUrl
-                    : `http://localhost:3000${avatarUrl}`
+                    : `${SERVER_URL}${avatarUrl}`
                 }
                 alt="Avatar"
                 className="w-full h-full object-cover"

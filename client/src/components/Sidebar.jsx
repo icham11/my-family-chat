@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import Avatar from "./Avatar";
+import JoinRoomModal from "./JoinRoomModal";
 
 const Sidebar = ({ rooms, currentRoom, onJoinRoom, onAddRoom, onNewChat }) => {
   const { user, logout } = useAuth();
+  const [showJoinModal, setShowJoinModal] = useState(false);
 
   const groups = rooms.filter((r) => r.type !== "direct");
   const dms = rooms.filter((r) => r.type === "direct");
@@ -69,25 +71,34 @@ const Sidebar = ({ rooms, currentRoom, onJoinRoom, onAddRoom, onNewChat }) => {
             <h3 className="text-[11px] uppercase text-text-secondary/50 font-bold tracking-widest">
               My Groups
             </h3>
-            <button
-              onClick={onAddRoom}
-              className="text-text-secondary hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
-              title="Create New Group"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <div className="flex gap-1">
+              <button
+                onClick={() => setShowJoinModal(true)}
+                className="text-text-secondary hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg text-xs font-semibold px-2 border border-white/5"
+                title="Join via Code"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </button>
+                JOIN
+              </button>
+              <button
+                onClick={onAddRoom}
+                className="text-text-secondary hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
+                title="Create New Group"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
           <div className="space-y-1">
             {groups.map((room) => (
@@ -182,6 +193,15 @@ const Sidebar = ({ rooms, currentRoom, onJoinRoom, onAddRoom, onNewChat }) => {
           Sign Out
         </button>
       </div>
+      {showJoinModal && (
+        <JoinRoomModal
+          onClose={() => setShowJoinModal(false)}
+          onJoined={(room) => {
+            setShowJoinModal(false);
+            window.location.reload();
+          }}
+        />
+      )}
     </div>
   );
 };

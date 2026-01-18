@@ -9,9 +9,9 @@ import AddRoomModal from "../components/AddRoomModal";
 import EditRoomModal from "../components/EditRoomModal";
 import MediaHistoryModal from "../components/MediaHistoryModal";
 import { useAuth } from "../context/AuthContext";
-import { chatService } from "../services/api";
+import { chatService, SERVER_URL } from "../services/api";
 
-const ENDPOINT = "http://localhost:3000";
+const ENDPOINT = SERVER_URL;
 
 const ChatPage = () => {
   const { user, logout } = useAuth();

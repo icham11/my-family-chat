@@ -1,6 +1,7 @@
 import axios from "axios";
 
-export const API_URL = "https://api.surgamenginap.site/api";
+export const SERVER_URL = "https://api.surgamenginap.site";
+export const API_URL = `${SERVER_URL}/api`;
 
 const api = axios.create({
   baseURL: API_URL,
@@ -28,6 +29,7 @@ export const chatService = {
   getRooms: () => api.get("/chat/rooms"),
   createDirectRoom: (targetUserId) =>
     api.post("/chat/rooms/dm", { targetUserId }),
+  joinRoom: (inviteCode) => api.post("/chat/rooms/join", { inviteCode }),
   searchUsers: (q) => api.get("/user/search", { params: { q } }),
   uploadImage: (formData) =>
     api.post("/upload", formData, {
