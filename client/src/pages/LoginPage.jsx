@@ -63,7 +63,7 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:3000/api/auth/google";
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   return (
@@ -72,12 +72,9 @@ const LoginPage = () => {
         {/* Luxury Decor */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-50"></div>
 
-        <h2 className="text-center mb-2 text-2xl font-bold text-white tracking-wide">
-          Welcome Back
-        </h2>
-        <p className="text-center mb-8 text-sm font-medium bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent italic animate-pulse">
+        <h2 className="text-center mb-8 text-2xl font-bold bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent italic tracking-wide animate-pulse">
           "Selamat datang orang baik"
-        </p>
+        </h2>
 
         {error && (
           <div className="p-3 mb-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg text-center">
